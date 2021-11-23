@@ -58,10 +58,6 @@ resource "helm_release" "code_server" {
     name  = "app.env.PASSWORD"
     value = random_password.code_server_password.result
   }
-
-  # depends_on = [
-  #   data.kubernetes_namespace.namespace,
-  # ]
 }
 
 resource "kubernetes_ingress" "ingress" {
@@ -100,8 +96,6 @@ resource "kubernetes_ingress" "ingress" {
 
   depends_on = [
     helm_release.code_server,
-    # data.kubernetes_namespace.namespace,
-
   ]
 }
 
