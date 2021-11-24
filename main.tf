@@ -9,6 +9,9 @@ resource "kubernetes_secret" "codeserver_secret" {
   metadata {
     name      = "codeserver-password"
     namespace = "develop"
+    labels = {
+      "ConnectOutput"="true"
+    }
   }
 
   data = {
