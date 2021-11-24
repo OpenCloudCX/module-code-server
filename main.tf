@@ -5,7 +5,7 @@ terraform {
   }
 }
 
-resource "kubernetes_secret" "codeserver_secret" {
+resource "kubernetes_secret" "codeserver" {
   metadata {
     name      = "codeserver-password"
     namespace = "develop"
@@ -15,26 +15,26 @@ resource "kubernetes_secret" "codeserver_secret" {
   }
 
   data = {
-    password = random_password.code_server_password.result
+    password = random_password.code_server.result
   }
 
   type = "kubernetes.io/basic-auth"
 }
 
-resource "aws_secretsmanager_secret" "code_server_secret" {
+resource "aws_secretsmanager_secret" "code_server" {
   name                    = "code_server"
   recovery_window_in_days = 0
 }
 
-resource "random_password" "code_server_password" {
+resource "random_password" "code_server" {
   length           = 24
   special          = true
   override_special = "_%@"
 }
 
-resource "aws_secretsmanager_secret_version" "code_server_secret_version" {
-  secret_id     = aws_secretsmanager_secret.code_server_secret.id
-  secret_string = "{\"password\": \"${random_password.code_server_password.result}\"}"
+resource "aws_secretsmanager_secret_version" "code_server" {
+  secret_id     = aws_secretsmanager_secret.code_server.id
+  secret_string = "{\"password\": \"${random_password.code_server.result}\"}"
 }
 
 resource "helm_release" "code_server" {
@@ -59,7 +59,7 @@ resource "helm_release" "code_server" {
 
   set {
     name  = "app.env.PASSWORD"
-    value = random_password.code_server_password.result
+    value = random_password.code_server.result
   }
 }
 
