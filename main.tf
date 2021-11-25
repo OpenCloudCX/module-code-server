@@ -5,22 +5,6 @@ terraform {
   }
 }
 
-resource "kubernetes_secret" "codeserver" {
-  metadata {
-    name      = "codeserver-password"
-    namespace = "develop"
-    labels = {
-      "ConnectOutput"="true"
-    }
-  }
-
-  data = {
-    password = random_password.code_server.result
-  }
-
-  type = "kubernetes.io/basic-auth"
-}
-
 resource "aws_secretsmanager_secret" "code_server" {
   name                    = "code_server"
   recovery_window_in_days = 0
@@ -63,13 +47,30 @@ resource "helm_release" "code_server" {
   }
 }
 
+resource "kubernetes_secret" "code_server" {
+  metadata {
+    name      = "code-server"
+    namespace = var.namespace
+    labels = {
+      "ConnectOutput" = "true"
+    }
+  }
+
+  data = {
+    username = "admin"
+    password = random_password.code_server.result
+  }
+
+  type = "kubernetes.io/basic-auth"
+}
+
 resource "kubernetes_ingress" "ingress" {
 
   wait_for_load_balancer = true
 
   metadata {
     name      = "code-server"
-    namespace = "develop"
+    namespace = var.namespace
 
     annotations = {
       "kubernetes.io/ingress.class"    = "nginx"
