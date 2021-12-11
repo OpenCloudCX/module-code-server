@@ -6,7 +6,7 @@ terraform {
 }
 
 resource "aws_secretsmanager_secret" "code_server" {
-  name                    = "code_server"
+  name                    = "code_server-${var.stack}"
   recovery_window_in_days = 0
 }
 
